@@ -1,0 +1,85 @@
+/* static/style.css */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 20px;
+}
+
+.container {
+    max-width: 1560px; /* Increased container width */
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+form {
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+input {
+    width: calc(100% - 16px);
+    padding: 10px; /* Increased padding for better readability */
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 15px; /* Default padding for table cells */
+    text-align: left;
+}
+
+th.item-name-header,
+td.item-name-input,
+th.cost-per-unit-header,
+td.calculation.cost-per-unit,
+th.total-item-cost-header,
+td.calculation.total-item-cost,
+th.markup-header,
+td.calculation.markup {
+    width: 200px; /* Custom width for specified fields */
+}
+
+th.percentage-header,
+td.calculation:not(.cost-per-unit):not(.total-item-cost):not(.markup) {
+    width: 75px; /* Default width for other fields */
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+button {
+    padding: 10px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}

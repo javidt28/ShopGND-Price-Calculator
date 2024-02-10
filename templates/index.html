@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopGND Price Calculator</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>ShopGND Price Calculator</h1>
+
+        <form id="priceForm" method="post" action="{{ url_for('index') }}">
+            <!-- Header Fields -->
+            <label>Total Shipment Cost:</label>
+            <input type="number" id="total_shipment_cost" name="total_shipment_cost" required>
+            <br>
+            <label>Total Freight:</label>
+            <input type="number" id="total_freight" name="total_freight" required>
+            <br>
+            <label>Brokerage:</label>
+            <input type="number" id="brokerage" name="brokerage" required>
+            <br>
+            <label>Trucking:</label>
+            <input type="number" id="trucking" name="trucking" required>
+            <br><br>
+
+            <!-- Item Table -->
+            <table border="1" id="itemTable">
+                <tr>
+                    <th class="item-name-header">Item Name</th>
+                    <th class="cost-per-unit-header">Cost Per Unit</th>
+                    <th class="quantity-header">Quantity</th>
+                    <th class="total-item-cost-header">Total Item Cost</th>
+                    <th class="percentage-header">CET (%)</th>
+                    <th class="percentage-header">VAT (%)</th>
+                    <th class="percentage-header">CSC (%)</th>
+                    <th class="percentage-header">EVL (%)</th>
+                    <th class="percentage-header">Markup (%)</th>
+                    <th class="sale-price-header">Sale Price</th>
+                </tr>
+                <tr>
+                    <td><input type="text" name="item_name[]" class="item-name-input" required></td>
+                    <td><input type="number" name="cost_per_unit[]" class="calculation cost-per-unit" required></td>
+                    <td><input type="number" name="quantity[]" class="calculation quantity" required></td>
+                    <td><input type="text" name="item_cost[]" readonly></td>
+                    <td><input type="number" name="cet[]" class="calculation cet" required></td>
+                    <td><input type="number" name="vat[]" class="calculation vat" required></td>
+                    <td><input type="number" name="csc[]" class="calculation csc" required></td>
+                    <td><input type="number" name="evl[]" class="calculation evl" required></td>
+                    <td><input type="number" name="markup[]" class="calculation markup" required></td>
+                    <td><input type="text" name="sale_price[]" readonly></td>
+                </tr>
+            </table>
+
+            <br><br>
+            <button type="button" onclick="addNewItem()">Add New Item</button>
+            <button type="button" onclick="exportData()">Export Data</button>
+            <br><br>
+
+            <!-- Removed the submit button -->
+        </form>
+    </div>
+
+    <script>
+        function addNewItem() {
+            var table = document.getElementById('itemTable');
+            var clone = table.rows[1].cloneNode(true);
+            
+            // Reset values in the cloned row
+            clone.querySelectorAll('input').forEach(function(input) {
+                input.value = '';
+            });
+
+            table.appendChild(clone);
+        }
+
+        document.getElementById('priceForm').addEventListener('input', function() {
+            updatePrices();
+        });
+
+        function updatePrices() {
+            var rows = document.querySelectorAll('#itemTable tr');
+            rows.forEach(function(row, index) {
+                if (index > 0) {
+                    var costPerUnit = parseFloat(row.querySelector('[name="cost_per_unit[]"]').value);
+                    var quantity = parseFloat(row.querySelector('[name="quantity[]"]').value);
+                    var cet = parseFloat(row.querySelector('[name="cet[]"]').value);
+                    var vat = parseFloat(row.querySelector('[name="vat[]"]').value);
+                    var csc = parseFloat(row.querySelector('[name="csc[]"]').value);
+                    var evl = parseFloat(row.querySelector('[name="evl[]"]').value);
+                    var markup = parseFloat(row.querySelector('[name="markup[]"]').value);
+
+                    // Calculate item cost and sale price
+                    var itemCost = costPerUnit * quantity;
+                    var totalCost = itemCost + (itemCost * (cet + vat + csc + evl + markup) / 100);
+                    totalCost += parseFloat(document.getElementById('total_shipment_cost').value) || 0;
+                    totalCost += parseFloat(document.getElementById('total_freight').value) || 0;
+                    totalCost += parseFloat(document.getElementById('brokerage').value) || 0;
+                    totalCost += parseFloat(document.getElementById('trucking').value) || 0;
+
+                    var itemCostInput = row.querySelector('[name="item_cost[]"]');
+                    itemCostInput.value = itemCost.toFixed(2);
+
+                    var salePriceInput = row.querySelector('[name="sale_price[]"]');
+                    salePriceInput.value = (totalCost / quantity).toFixed(2);
+                }
+            });
+        }
+
+        function exportData() {
+        // Create a clone of the table
+        var tableClone = document.getElementById('itemTable').cloneNode(true);
+
+        // Remove input elements from the cloned table to avoid interference
+        tableClone.querySelectorAll('input').forEach(function (input) {
+            input.parentNode.innerHTML = input.value;
+        });
+
+        // Get the HTML content of the cloned table
+        var html = tableClone.outerHTML;
+
+        // Create a Blob containing the HTML table data
+        var blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+
+        // Create a download link and trigger a click on it
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'ShopGND_Data.xls';
+        a.click();
+    }
+    </script>
+</body>
+</html>
